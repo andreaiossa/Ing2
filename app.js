@@ -8,6 +8,7 @@ app.set('port', (process.env.PORT || 5000));
 
 const match_list = {};
 
+const isInteger = Number.isInteger;
 
 function isNumber(value) {
     return typeof value === 'number' && isFinite(value);
@@ -15,6 +16,16 @@ function isNumber(value) {
 
 function isInt(n) {
     return Number(n) === n && n % 1 === 0;
+}
+
+function isString(value) {
+    return (typeof value === 'string' || value instanceof String) && value.length > 0;
+}
+
+function toInt(value) {
+    if (/^(\-|\+)?([0-9]+|Infinity)$/.test(value))
+        return Number(value);
+    return NaN;
 }
 
 function Response(status, result) {
@@ -33,7 +44,7 @@ function Response(status, result) {
 
 function Match(guardia, ladro) {
     this.id = 1;
-    while (exams_list[this.id]) {
+    while (matches_list[this.id]) {
         this.id++;
     }
     this.guardia = guardia;
@@ -70,12 +81,42 @@ function match_POST(req) {
     return new Response(201, match);
 }
 
+function matches_GET(req) {
+    let result = Object.values(match_list);
+
+    return new Response(200, { matches: result });
+}
+
+function matches_matchID_GET(req) {
+    let id = toInt(req.params.id);
+    if (!isInteger(id) || id < 1) {
+        return new Response(404, "Bad id parameter");
+    }
+    if (!match_list[id]) {
+        return new Response(404, "Exam not found");
+    }
+    return new Response(200, match_list[id]);
+}
+
+
+
 app.post("/games", (req, res) => {
     let response = match_POST(req);
     res.status(response.status);
     res.send(response.json || response.text);
-})
+});
 
+app.get("/games", (req, res) => {
+    let response = matches_GET(req);
+    res.status(response.status);
+    res.send(response.json || response.text);
+});
+
+app.get("/games/:id", (req, res) => {
+    let response = matches_matchID_GET(req);
+    res.status(response.status);
+    res.send(response.json || response.text);
+});
 
 
 
