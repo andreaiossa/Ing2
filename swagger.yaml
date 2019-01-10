@@ -1,0 +1,30 @@
+swagger: '2.0'
+info:
+  version: '1.0'
+  title: Es1
+  description: API that manages assigments
+host: es1simulazione-188364.herokuapp.com
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /assigments:
+    get:
+      description: Returns assigments list.
+      tags:
+        - /assigments
+      responses:
+        '200':
+          description: An assigments list.
+          schema:
+            type: object
+            properties:
+              tot_assigments:
+                description: Total number of assigments
+                type: integer
+                minimum: 0
+            required:
+              - tot_assigments
