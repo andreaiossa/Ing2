@@ -4,7 +4,7 @@ const express = require('express'),
 
 const app = express();
 app.use(bodyParser.json());
-app.set('port', (process.env.PORT || 5000));
+app.set('port', (process.env.PORT || 8001));
 
 const match_list = {};
 
@@ -44,7 +44,7 @@ function Response(status, result) {
 
 function Match(guardia, ladro) {
     this.id = 1;
-    while (matches_list[this.id]) {
+    while (match_list[this.id]) {
         this.id++;
     }
     this.guardia = guardia;
@@ -107,11 +107,11 @@ function matches_matchID_PATCH(req) {
     if ((guardia !== undefined) && (ladro !== undefined)) {
         return new Response(400, "Bad request");
     }
-    if (guardia !== undefind) {
+    if (guardia !== undefined) {
         key = "guardia";
         valore = guardia;
     }
-    if (ladro !== undefind) {
+    if (ladro !== undefined) {
         key = "ladro";
         valore = ladro;
     }
@@ -171,14 +171,14 @@ app.patch("/games/:id", (req, res) => {
 });
 
 
-
-
-
-
-
-
-
-
 app.listen(app.get('port'), function () {
     console.log('Node app is running on port', app.get('port'));
 });
+
+
+module.exports = {
+    match_POST,
+    matches_GET,
+    matches_matchID_GET,
+    matches_matchID_PATCH
+};
