@@ -90,12 +90,58 @@ function matches_GET(req) {
 function matches_matchID_GET(req) {
     let id = toInt(req.params.id);
     if (!isInteger(id) || id < 1) {
-        return new Response(404, "Bad id parameter");
+        return new Response(400, "Bad id parameter");
     }
     if (!match_list[id]) {
-        return new Response(404, "Exam not found");
+        return new Response(404, "Game not found");
     }
     return new Response(200, match_list[id]);
+}
+
+function matches_matchID_PATCH(req) {
+    let guardia = req.body.guardia;
+    let ladro = req.body.ladro;
+    let valore;
+    let key;
+
+    if ((guardia !== undefined) && (ladro !== undefined)) {
+        return new Response(400, "Bad request");
+    }
+    if (guardia !== undefind) {
+        key = "guardia";
+        valore = guardia;
+    }
+    if (ladro !== undefind) {
+        key = "ladro";
+        valore = ladro;
+    }
+
+    if (!isNumber(valore)) return new Response(400, "Bad request");
+    if (!isInt(valore)) return new Response(400, "Bad request");
+    if (valore > 10) return new Response(400, "Bad request");
+    if (valore < -10) return new Response(400, "Bad request");
+
+    let id = toInt(req.params.id);
+
+    if (!isInteger(id) || id < 1) {
+        return new Response(400, "Bad id parameter");
+    }
+    if (!match_list[id]) {
+        return new Response(404, "Game not found");
+    }
+
+    let game = match_list[id];
+    if (game.catturato === true) {
+        return new Response(400, "already completed");
+    }
+
+    game[key] = valore;
+    if (game.guardia === game.ladro) {
+        game.catturato = true;
+    }
+
+    match_list[id] = game;
+    return new Response(200, game);
 }
 
 
@@ -118,6 +164,11 @@ app.get("/games/:id", (req, res) => {
     res.send(response.json || response.text);
 });
 
+app.patch("/games/:id", (req, res) => {
+    let response = matches_matchID_PATCH(req);
+    res.status(response.status);
+    res.send(response.json || response.text);
+});
 
 
 
